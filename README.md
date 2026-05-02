@@ -1,2 +1,0 @@
-# hardwired
-Hardwired Terminal 

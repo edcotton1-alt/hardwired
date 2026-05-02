@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HARDWIRED TERMINAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --term: 'VT323', ui-monospace, 'Courier New', Courier, monospace;
+    --bg: #0a0a0a;
+    --fg: #e8e6df;
+    --dim: #666;
+    --mid: #888;
+    --red: #E24B4A;
+    --redDim: #A32D2D;
+    --redLite: #F09595;
+    --amber: #c9a45e;
+    --green: #6ea36e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #050505;
+    color: var(--fg);
+    font-family: var(--term);
+    min-height: 100vh;
+    font-size: 18px;
+  }
+  body { display: flex; align-items: center; justify-content: center; padding: 20px 12px; }
+  #hw {
+    background: var(--bg); color: var(--fg);
+    width: 100%; max-width: 760px;
+    border: 1px solid #222;
+    display: flex; flex-direction: column;
+    min-height: 720px;
+  }
+  #hw, #hw button, #hw input, #hw pre {
+    font-family: var(--term);
+    font-size: 18px; line-height: 1.25; letter-spacing: 0.01em;
+  }
+  #out-wrap { flex: 1; overflow-y: auto; max-height: 600px; scrollbar-width: thin; scrollbar-color: #2a2a2a var(--bg); }
+  #out-wrap::-webkit-scrollbar { width: 8px; }
+  #out-wrap::-webkit-scrollbar-track { background: var(--bg); }
+  #out-wrap::-webkit-scrollbar-thumb { background: #2a2a2a; }
+  #out {
+    padding: 12px 14px;
+    white-space: pre-wrap; overflow-wrap: break-word; word-break: normal;
+    text-shadow: 0 0 1px rgba(232,230,223,0.15);
+  }
+  #out pre { white-space: pre; font-family: var(--term); overflow-x: auto; }
+  .chrome {
+    padding: 4px 14px; background: #0d0d0d;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex; justify-content: space-between;
+    color: var(--dim); font-size: 16px; flex-shrink: 0;
+  }
+  .chrome.foot { border-top: 1px solid #1a1a1a; border-bottom: none; }
+  .btn {
+    display: inline-block; color: var(--fg); cursor: pointer;
+    margin-right: 4px; padding: 0 2px; user-select: none;
+  }
+  .btn:hover { color: var(--red); }
+  .btn.primary { color: var(--red); }
+  .btn.primary:hover { background: var(--red); color: var(--bg); }
+  #chips {
+    padding: 6px 14px; background: #0d0d0d;
+    border-top: 1px solid #1a1a1a; flex-shrink: 0; color: var(--dim);
+  }
+  #prompt-row {
+    padding: 6px 14px 8px; background: #0d0d0d; flex-shrink: 0;
+    display: flex; align-items: baseline; gap: 4px;
+  }
+  #in {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--fg); caret-color: var(--red); min-width: 0;
+  }
+  ::selection { background: var(--red); color: var(--bg); }
+  a, .link { color: var(--red); cursor: pointer; }
+  a:hover, .link:hover { background: var(--red); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<div id="hw">
+
+  <div class="chrome">
+    <div>HARDWIRED · INVERNESS CONSULTING · <span id="meta-version">v—</span></div>
+    <div><span id="page-id">— —</span> &nbsp; <span id="clock">--:--:--</span></div>
+  </div>
+
+  <div id="out-wrap"><div id="out"></div></div>
+
+  <div id="chips"></div>
+
+  <div id="prompt-row">
+    <span style="color: var(--red);">&gt;</span>
+    <span style="color: var(--mid);">hardwired:</span><span id="ctx" style="color: var(--mid);">main</span><span style="color: var(--mid);">$</span>
+    <input id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+    <span class="btn" id="help-btn" style="color: var(--mid);">[?]</span>
+  </div>
+
+  <div class="chrome foot">
+    <div>HARDWIRED · INVERNESS CONSULTING</div>
+    <div id="hint">type a command or click a [bracketed] item</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // ──────────────────────────────────────────────────────────────
+  //  STATE
+  // ──────────────────────────────────────────────────────────────
+  let DATA = null;     // full data.json once loaded
+  let META = null;     // _meta block
+  let INDEX = null;    // _index — light list of all records
+  let RECS = null;     // records — full records keyed by ticker
+
+  let context='main', page='boot', busy=false, currentTicker=null;
+  const history=[]; let histIdx=-1;
+
+  // ──────────────────────────────────────────────────────────────
+  //  DOM HANDLES
+  // ──────────────────────────────────────────────────────────────
+  const out = document.getElementById('out');
+  const outWrap = document.getElementById('out-wrap');
+  const inp = document.getElementById('in');
+  const ctxEl = document.getElementById('ctx');
+  const clock = document.getElementById('clock');
+  const pageId = document.getElementById('page-id');
+  const chipsEl = document.getElementById('chips');
+  const hint = document.getElementById('hint');
+  const helpBtn = document.getElementById('help-btn');
+  const metaVer = document.getElementById('meta-version');
+
+  // ──────────────────────────────────────────────────────────────
+  //  CLOCK
+  // ──────────────────────────────────────────────────────────────
+  function tick(){
+    const d=new Date(),pad=n=>String(n).padStart(2,'0');
+    clock.textContent=pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds())+' UTC';
+  }
+  tick(); setInterval(tick,1000);
+
+  // ──────────────────────────────────────────────────────────────
+  //  HELPERS
+  // ──────────────────────────────────────────────────────────────
+  function el(html){
+    const d=document.createElement('div'); d.innerHTML=html; out.appendChild(d);
+    outWrap.scrollTop=outWrap.scrollHeight; return d;
+  }
+  function pre(c){ return '<pre>'+c+'</pre>'; }
+  function clearOut(){ out.innerHTML=''; }
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function pad(s,n,c){ c=c||' '; s=String(s); while(s.length<n) s+=c; return s; }
+  function rule(){ el('<div style="color: var(--dim); opacity: 0.5;">'+'─'.repeat(72)+'</div>'); }
+
+  async function typeLine(html,delay){
+    delay=delay||7; busy=true;
+    const div=el('<div></div>');
+    let i=0,inTag=false,buffer='';
+    while(i<html.length){
+      const ch=html[i];
+      if(ch==='<') inTag=true; buffer+=ch; if(ch==='>') inTag=false;
+      if(!inTag){ div.innerHTML=buffer; outWrap.scrollTop=outWrap.scrollHeight; await sleep(delay); }
+      i++;
+    }
+    div.innerHTML=html; busy=false;
+  }
+
+  function echo(cmd){
+    el('<div style="color: var(--mid); margin-top: 4px;"><span style="color: var(--red);">&gt;</span> '+
+       '<span style="color: var(--dim);">hardwired:'+context+'$</span> '+
+       '<span style="color: var(--fg);">'+escapeHtml(cmd)+'</span></div>');
+  }
+  function setHint(t){ hint.textContent=t; }
+  function setContext(c){ context=c; ctxEl.textContent=c; renderChips(); }
+  function setPageId(t){ pageId.textContent=t; }
+
+  // ──────────────────────────────────────────────────────────────
+  //  FRESHNESS — days since scoredOn, with a label and color
+  // ──────────────────────────────────────────────────────────────
+  function daysOld(scoredOn){
+    if(!scoredOn) return null;
+    const then = new Date(scoredOn);
+    const now = new Date();
+    const diff = (now - then) / (1000 * 60 * 60 * 24);
+    return Math.floor(diff);
+  }
+  function freshness(scoredOn){
+    const d = daysOld(scoredOn);
+    if(d === null) return { label: '— —', color: 'var(--dim)', days: null };
+    if(d <= 90)  return { label: 'FRESH',  color: 'var(--green)', days: d };
+    if(d <= 180) return { label: 'AGING',  color: 'var(--amber)', days: d };
+    return { label: 'STALE',  color: 'var(--red)',   days: d };
+  }
+  function freshChip(scoredOn){
+    const f = freshness(scoredOn);
+    return '<span style="color: '+f.color+';">[ '+f.label+' '+(f.days!==null?f.days+'d':'—')+' ]</span>';
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  //  COLORS / GLYPHS
+  // ──────────────────────────────────────────────────────────────
+  function gradeColor(g){
+    if(!g) return 'var(--dim)';
+    if(g.startsWith('A')) return 'var(--fg)';
+    if(g.startsWith('B')) return 'var(--amber)';
+    if(g.startsWith('C')) return 'var(--redLite)';
+    if(g.startsWith('D')||g==='F') return 'var(--red)';
+    return 'var(--dim)';
+  }
+  function gateGlyph(s){
+    if(s==='pass') return '<span style="color: var(--fg);">●</span>';
+    if(s==='fail') return '<span style="color: var(--red);">✕</span>';
+    if(s==='partial') return '<span style="color: var(--amber);">◐</span>';
+    return '<span style="color: var(--dim);">·</span>';
+  }
+  function dimBar(score){
+    if(score === 0){
+      return '<span style="color: var(--red);">▢▢▢▢▢</span>';
+    }
+    let out='';
+    for(let i=1;i<=5;i++){
+      if(i<=score){
+        const c=score>=4?'var(--fg)':score>=2?'var(--amber)':'var(--red)';
+        out+='<span style="color: '+c+';">█</span>';
+      } else out+='<span style="color: var(--dim);">░</span>';
+    }
+    return out;
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  //  PAGES
+  // ──────────────────────────────────────────────────────────────
+
+  async function pageHome(){
+    clearOut(); setPageId('— —'); setContext('main'); page='home'; renderChips();
+    el('<div style="color: var(--fg); font-size: 22px; padding-top: 4px;">HARDWIRED '+(META?.methodology||'')+' · INVERNESS CONSULTING</div>');
+    el('<div style="color: var(--dim); padding-bottom: 6px;">'+(META?.lastPublished||'—')+' · '+(INDEX?.length||0)+' records on file</div>');
+    rule();
+    el('<div style="color: var(--mid);">A working surface for the Hardwired framework. Each company is a record;</div>');
+    el('<div style="color: var(--mid);">each record carries grade, pool, mediation, durability, the LLM/agentic</div>');
+    el('<div style="color: var(--mid);">era evaluation, and the v3 apparatus (gates, MINI test, adversarial trail,</div>');
+    el('<div style="color: var(--mid);">financial check). Every record is dated; freshness is visible on every page.</div>');
+    rule();
+    el('<div style="color: var(--dim);">▌ COMMANDS</div>');
+    el(pre(
+      '<span style="color: var(--red);">'+pad('list',18)+'</span><span style="color: var(--mid);">all records on file</span>\n'+
+      '<span style="color: var(--red);">'+pad('SBUX',18)+'</span><span style="color: var(--mid);">load a record by ticker</span>\n'+
+      '<span style="color: var(--red);">'+pad('filter <f>=<v>',18)+'</span><span style="color: var(--mid);">filter by pool, mediation, grade, durability, cell</span>\n'+
+      '<span style="color: var(--red);">'+pad('compare A B',18)+'</span><span style="color: var(--mid);">side-by-side two records</span>\n'+
+      '<span style="color: var(--red);">'+pad('grid',18)+'</span><span style="color: var(--mid);">pool × mediation cell map</span>\n'+
+      '<span style="color: var(--red);">'+pad('help',18)+'</span><span style="color: var(--mid);">full command list</span>'
+    ));
+    rule();
+    const sample = INDEX && INDEX.length ? INDEX[0].ticker : 'SBUX';
+    el('<div style="color: var(--mid);">try <span class="link" onclick="window.__hwRun(\'list\')">[list]</span>, <span class="link" onclick="window.__hwRun(\'grid\')">[grid]</span>, or a ticker like <span class="link" onclick="window.__hwRun(\''+sample+'\')">['+sample+']</span>.</div>');
+    outWrap.scrollTop=0;
+  }
+
+  function pageList(){
+    clearOut(); setPageId('LIST'); setContext('main'); page='list'; renderChips();
+    el('<div style="color: var(--dim);">▌ ALL RECORDS · '+INDEX.length+' ON FILE</div>');
+    el('<div style="height: 4px;"></div>');
+
+    let html='';
+    html+='<span style="color: var(--dim);">┌────────┬──────────────┬──────┬────────────────┬───────────┬──────────────┬─────────────┐</span>\n';
+    html+='<span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('TICKER',7)+'</span><span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('NAME',13)+'</span><span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('GRADE',5)+'</span><span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('POOL',15)+'</span><span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('MEDIATION',10)+'</span><span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('DURABILITY',13)+'</span><span style="color: var(--dim);">│ </span>'+
+          '<span style="color: var(--fg);">'+pad('FRESH',12)+'</span><span style="color: var(--dim);">│</span>\n';
+    html+='<span style="color: var(--dim);">├────────┼──────────────┼──────┼────────────────┼───────────┼──────────────┼─────────────┤</span>\n';
+    for(const r of INDEX){
+      const gC=gradeColor(r.grade);
+      const f=freshness(r.scoredOn);
+      const freshDisp = f.label+' '+(f.days!==null?f.days+'d':'—');
+      html+='<span style="color: var(--dim);">│ </span>'+
+            '<span class="link" onclick="window.__hwRun(\''+r.ticker+'\')">'+pad(r.ticker,7)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--fg);">'+pad(r.name,13)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: '+gC+';">'+pad(r.grade,5)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--mid);">'+pad(r.pool,15)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--mid);">'+pad(r.mediation,10)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--mid);">'+pad(r.durability,13)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: '+f.color+';">'+pad(freshDisp,12)+'</span><span style="color: var(--dim);">│</span>\n';
+    }
+    html+='<span style="color: var(--dim);">└────────┴──────────────┴──────┴────────────────┴───────────┴──────────────┴─────────────┘</span>';
+    el(pre(html));
+    rule();
+    el('<div style="color: var(--mid);">click any TICKER above, or filter: <span class="link" onclick="window.__hwRun(\'filter pool=era-orthogonal\')">[filter pool=era-orthogonal]</span> · <span class="link" onclick="window.__hwRun(\'filter grade=A\')">[filter grade=A]</span></div>');
+    outWrap.scrollTop=0;
+  }
+
+  function pageFilter(field,value){
+    clearOut(); setPageId('FILTER · '+field+'='+value); setContext('main'); page='filter'; renderChips();
+    const valid=['pool','mediation','grade','durability','cell'];
+    if(!valid.includes(field)){
+      el('<div style="color: var(--red);">unknown filter field :: '+field+'</div>');
+      el('<div style="color: var(--dim);">valid: pool, mediation, grade, durability, cell</div>');
+      return;
+    }
+    const matches=INDEX.filter(r=>{
+      const v=String(r[field]).toLowerCase();
+      return v===value.toLowerCase()||v.includes(value.toLowerCase());
+    });
+    el('<div style="color: var(--dim);">▌ FILTER · '+field+' = '+value+' · '+matches.length+' match'+(matches.length===1?'':'es')+'</div>');
+    if(!matches.length){
+      el('<div style="color: var(--mid); padding-top: 8px;">no records match. try <span class="link" onclick="window.__hwRun(\'list\')">[list]</span>.</div>');
+      return;
+    }
+    el('<div style="height: 6px;"></div>');
+    let html='';
+    html+='<span style="color: var(--dim);">┌────────┬──────────────┬──────┬────────────────┬───────────┬──────────────┬─────────────┐</span>\n';
+    for(const r of matches){
+      const gC=gradeColor(r.grade);
+      const f=freshness(r.scoredOn);
+      const freshDisp = f.label+' '+(f.days!==null?f.days+'d':'—');
+      html+='<span style="color: var(--dim);">│ </span>'+
+            '<span class="link" onclick="window.__hwRun(\''+r.ticker+'\')">'+pad(r.ticker,7)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--fg);">'+pad(r.name,13)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: '+gC+';">'+pad(r.grade,5)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--mid);">'+pad(r.pool,15)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--mid);">'+pad(r.mediation,10)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: var(--mid);">'+pad(r.durability,13)+'</span><span style="color: var(--dim);">│ </span>'+
+            '<span style="color: '+f.color+';">'+pad(freshDisp,12)+'</span><span style="color: var(--dim);">│</span>\n';
+    }
+    html+='<span style="color: var(--dim);">└────────┴──────────────┴──────┴────────────────┴───────────┴──────────────┴─────────────┘</span>';
+    el(pre(html));
+    outWrap.scrollTop=0;
+  }
+
+  function pageRecord(ticker){
+    clearOut();
+    const r=RECS[ticker.toUpperCase()];
+    if(!r){
+      el('<div style="color: var(--red);">no record found :: '+ticker+'</div>');
+      el('<div style="color: var(--dim);">try <span class="link" onclick="window.__hwRun(\'list\')">[list]</span>.</div>');
+      return;
+    }
+    setPageId(r.ticker); setContext(r.ticker.toLowerCase()); page='record'; currentTicker=r.ticker; renderChips();
+
+    const gC=gradeColor(r.grade);
+    el('<div style="font-size: 28px; color: var(--fg); padding-top: 4px;">'+r.name.toUpperCase()+'  <span style="color: '+gC+';">'+r.grade+'</span>  '+freshChip(r.scoredOn)+'</div>');
+    el('<div style="color: var(--dim);">'+r.exchange+':'+r.ticker+'  ·  EST.'+r.founded+'  ·  CEO:'+r.ceo+'  ·  scored '+r.scoredOn+'  ·  '+r.methodology+'</div>');
+    rule();
+
+    el('<div style="color: var(--dim);">▌ PLACEMENT</div>');
+    el(pre(
+      '<span style="color: var(--mid);">  pool        </span><span style="color: var(--fg);">'+r.pool+'</span>\n'+
+      '<span style="color: var(--mid);">  mediation   </span><span style="color: var(--fg);">'+r.mediation+'</span>\n'+
+      '<span style="color: var(--mid);">  durability  </span><span style="color: var(--fg);">'+r.durability+'</span>\n'+
+      '<span style="color: var(--mid);">  cell        </span><span style="color: var(--fg);">'+r.cell+'</span>'
+    ));
+    rule();
+
+    el('<div style="color: var(--dim);">▌ VERDICT</div>');
+    el('<div style="color: var(--fg); padding: 4px 0;">'+r.verdict+'</div>');
+    rule();
+
+    el('<div style="color: var(--dim);">▌ NAMED DIFFERENCES</div>');
+    let dh='';
+    r.differences.forEach((d,i)=>{
+      dh+='<span style="color: var(--mid);">  '+(i+1)+'. </span><span style="color: var(--fg);">'+d+'</span>\n';
+    });
+    el(pre(dh));
+    rule();
+
+    el('<div style="color: var(--dim);">▌ NINE DIMENSIONS</div>');
+    let dimHtml='';
+    ['d1','d2','d3','d4','d5','d6','d7','d8','d9'].forEach(k=>{
+      const d=r.dimensions[k];
+      dimHtml+='<span style="color: var(--dim);">  '+k+' </span>'+
+              '<span style="color: var(--mid);">'+pad(d.label,18)+'</span>'+
+              dimBar(d.score)+
+              '<span style="color: var(--dim);"> '+d.score+'/5</span>\n';
+    });
+    el(pre(dimHtml));
+    rule();
+
+    el('<div style="color: var(--dim);">▌ FIVE GATES</div>');
+    let gh='';
+    [
+      ['selfKnowledge','self-knowledge'],
+      ['eraRelevance','era-relevance'],
+      ['structuralProtection','structural protection'],
+      ['activeResponse','active response'],
+      ['internalCoherence','internal coherence']
+    ].forEach(([k,label])=>{
+      const v=r.gates[k];
+      const c=v==='pass'?'var(--fg)':v==='fail'?'var(--red)':'var(--amber)';
+      gh+='  '+gateGlyph(v)+' <span style="color: var(--mid);">'+pad(label,22)+'</span><span style="color: '+c+';">'+v+'</span>\n';
+    });
+    el(pre(gh));
+    rule();
+
+    el('<div style="color: var(--dim);">▌ MINI TEST</div>');
+    const m=r.miniTest;
+    const mC=m.result==='pass'?'var(--fg)':'var(--red)';
+    el(pre(
+      '<span style="color: var(--mid);">  figure  </span><span style="color: '+mC+';">'+m.figure+'</span>\n'+
+      '<span style="color: var(--mid);">  moment  </span><span style="color: var(--fg);">'+(m.moment||'<span style="color: var(--dim);">— none on record —</span>')+'</span>\n'+
+      '<span style="color: var(--mid);">  result  </span><span style="color: '+mC+';">'+m.result.toUpperCase()+'</span>'
+    ));
+    rule();
+
+    if(r.adversarialFlags && r.adversarialFlags.length){
+      el('<div style="color: var(--dim);">▌ ADVERSARIAL FLAGS</div>');
+      let af='';
+      r.adversarialFlags.forEach(f=>{
+        af+='<span style="color: var(--red);">  ! </span><span style="color: var(--redLite);">'+f+'</span>\n';
+      });
+      el(pre(af));
+      rule();
+    } else {
+      el('<div style="color: var(--dim);">▌ ADVERSARIAL FLAGS</div>');
+      el('<div style="color: var(--mid);"> &nbsp; — none — adversarial tests pass</div>');
+      rule();
+    }
+
+    if(r.era){
+      el('<div style="color: var(--dim);">▌ ERA EVALUATION · LLM &amp; AGENTIC READING</div>');
+
+      function eraField(label, hint, field){
+        if(!field){
+          return '<span style="color: var(--red);">  '+pad(label,20)+'</span><span style="color: var(--dim);">'+hint+'</span>\n'+
+                 '<span style="color: var(--dim);">    — no data —</span>\n\n';
+        }
+        let head = '<span style="color: var(--red);">  '+pad(label,20)+'</span><span style="color: var(--dim);">'+hint+'</span>\n';
+        if(field.status === 'awaiting'){
+          head += '<span style="color: var(--red);">    [ AWAITING VERIFICATION ]</span>\n';
+          if(field.note) head += '<span style="color: var(--mid);">    '+field.note+'</span>\n';
+          if(field.query) head += '<span style="color: var(--dim);">    query :: "'+field.query+'"</span>\n';
+        } else if(field.status === 'stale'){
+          head += '<span style="color: var(--amber);">    [ STALE — refresh due ]</span>\n';
+          if(field.text) head += '<span style="color: var(--fg);">    '+field.text+'</span>\n';
+        } else {
+          if(field.text) head += '<span style="color: var(--fg);">    '+field.text+'</span>\n';
+          if(field.verifiedOn){
+            const f = freshness(field.verifiedOn);
+            head += '<span style="color: var(--dim);">    verified '+field.verifiedOn+' · </span><span style="color: '+f.color+';">'+f.label+' '+f.days+'d</span>\n';
+          }
+        }
+        return head + '\n';
+      }
+
+      // Synthesis layer — has its own 30-day freshness clock; check it
+      let syn = r.era.synthesisLayer;
+      if(syn && syn.status === 'verified' && syn.verifiedOn){
+        const d = daysOld(syn.verifiedOn);
+        if(d > 30){
+          syn = Object.assign({}, syn, { status: 'stale' });
+        }
+      }
+
+      el(pre(
+        eraField('synthesis layer',   ' — what models surface about this company',           syn) +
+        eraField('transaction layer', ' — what the company is doing at the agent layer',     r.era.transactionLayer) +
+        eraField('agent-readability', ' — structural commitments a model could cite',        r.era.agentReadability)
+      ).replace(/\n\s*$/, ''));
+
+      if(r.era.verdict){
+        el('<div style="color: var(--mid); padding: 6px 0 4px; font-style: italic;">  '+r.era.verdict+'</div>');
+      }
+      rule();
+    }
+
+    el('<div style="color: var(--dim);">▌ FINANCIAL CHECK</div>');
+    const fc=r.financialCheck;
+    el(pre(
+      '<span style="color: var(--mid);">  trajectory   </span><span style="color: var(--fg);">'+fc.trajectory+'</span>\n'+
+      '<span style="color: var(--mid);">  margin       </span><span style="color: var(--fg);">'+fc.marginTrend+'</span>\n'+
+      '<span style="color: var(--mid);">  validates    </span><span style="color: '+(fc.valid?'var(--fg)':'var(--red)')+';">'+(fc.valid?'YES':'NO')+'</span>\n'+
+      '<span style="color: var(--mid);">  note         </span><span style="color: var(--mid);">'+fc.note+'</span>'
+    ));
+    rule();
+
+    if((r.fix?.programs?.length)||(r.fix?.constraints?.length)){
+      el('<div style="color: var(--dim);">▌ PROGRAMS · CONSTRAINTS</div>');
+      const half=32, maxLen=Math.max(r.fix.programs.length,r.fix.constraints.length);
+      let fh='';
+      fh+='<span style="color: var(--mid);">  '+pad('PROGRAMS — loose',half)+'</span>'+
+          '<span style="color: var(--red);">'+pad('CONSTRAINTS — soldered',half)+'</span>\n';
+      fh+='<span style="color: var(--dim);">  '+pad('────────────────',half)+'</span>'+
+          '<span style="color: var(--redDim);">'+pad('──────────────────────',half)+'</span>\n';
+      for(let i=0;i<maxLen;i++){
+        const p=r.fix.programs[i]?'○ '+r.fix.programs[i]:'';
+        const cn=r.fix.constraints[i]?'✕ '+r.fix.constraints[i]:'';
+        fh+='<span style="color: var(--fg);">  '+pad(p,half)+'</span>'+
+            '<span style="color: var(--redLite);">'+pad(cn,half)+'</span>\n';
+      }
+      el(pre(fh));
+      rule();
+    }
+
+    el('<div style="color: var(--dim); font-size: 14px;">methodology '+r.methodology+' · scored '+r.scoredOn+' · re-score on: '+r.rescoreTriggers.join(' / ')+'</div>');
+    outWrap.scrollTop=0;
+  }
+
+  function pageCompare(t1,t2){
+    clearOut(); setPageId('COMPARE · '+t1+' / '+t2); setContext('main'); page='compare'; renderChips();
+    const r1=RECS[t1.toUpperCase()], r2=RECS[t2.toUpperCase()];
+    if(!r1||!r2){
+      el('<div style="color: var(--red);">one or both records not found :: '+t1+', '+t2+'</div>');
+      return;
+    }
+    el('<div style="color: var(--dim);">▌ COMPARE · '+r1.name+' vs '+r2.name+'</div>');
+    el('<div style="height: 8px;"></div>');
+
+    const colW=24;
+    function row(label,v1,v2,c1,c2){
+      c1=c1||'var(--fg)'; c2=c2||'var(--fg)';
+      return '<span style="color: var(--mid);">  '+pad(label,14)+'</span>'+
+             '<span style="color: '+c1+';">'+pad(v1,colW)+'</span>'+
+             '<span style="color: '+c2+';">'+v2+'</span>\n';
+    }
+
+    let html='';
+    html+='<span style="color: var(--mid);">  '+pad('',14)+'</span>'+
+          '<span style="color: var(--fg);">'+pad(r1.name.toUpperCase(),colW)+'</span>'+
+          '<span style="color: var(--fg);">'+r2.name.toUpperCase()+'</span>\n';
+    html+='<span style="color: var(--dim);">  '+pad('',14)+pad(r1.ticker,colW)+r2.ticker+'</span>\n';
+    html+='<span style="color: var(--dim);">  '+'─'.repeat(60)+'</span>\n';
+    html+=row('grade',r1.grade,r2.grade,gradeColor(r1.grade),gradeColor(r2.grade));
+    html+=row('pool',r1.pool,r2.pool);
+    html+=row('mediation',r1.mediation,r2.mediation);
+    html+=row('durability',r1.durability,r2.durability);
+    html+=row('cell',r1.cell,r2.cell);
+    const f1=freshness(r1.scoredOn), f2=freshness(r2.scoredOn);
+    html+=row('freshness',f1.label+' '+f1.days+'d',f2.label+' '+f2.days+'d',f1.color,f2.color);
+    html+='<span style="color: var(--dim);">  '+'─'.repeat(60)+'</span>\n';
+
+    ['d1','d2','d3','d4','d5','d6','d7','d8','d9'].forEach(k=>{
+      const a=r1.dimensions[k], b=r2.dimensions[k];
+      html+='<span style="color: var(--dim);">  '+k+' </span>'+
+            '<span style="color: var(--mid);">'+pad(a.label,11)+'</span>'+
+            dimBar(a.score)+'<span style="color: var(--dim);">'+pad('',colW-11-5)+'</span>'+
+            dimBar(b.score)+'\n';
+    });
+    html+='<span style="color: var(--dim);">  '+'─'.repeat(60)+'</span>\n';
+
+    [
+      ['selfKnowledge','self-know'],
+      ['eraRelevance','era-rel'],
+      ['structuralProtection','struct-prot'],
+      ['activeResponse','response'],
+      ['internalCoherence','coherence']
+    ].forEach(([k,label])=>{
+      html+='<span style="color: var(--mid);">  '+pad(label,14)+'</span>'+
+            gateGlyph(r1.gates[k])+'<span style="color: var(--dim);">'+pad('',colW-1)+'</span>'+
+            gateGlyph(r2.gates[k])+'\n';
+    });
+    el(pre(html));
+    rule();
+    el('<div style="color: var(--mid);">open <span class="link" onclick="window.__hwRun(\''+r1.ticker+'\')">['+r1.ticker+']</span> or <span class="link" onclick="window.__hwRun(\''+r2.ticker+'\')">['+r2.ticker+']</span> for full record.</div>');
+    outWrap.scrollTop=0;
+  }
+
+  function pageGrid(){
+    clearOut(); setPageId('GRID'); setContext('main'); page='grid'; renderChips();
+    el('<div style="color: var(--dim);">▌ POOL × MEDIATION GRID</div>');
+    el('<div style="color: var(--mid); font-size: 14px;">  the '+INDEX.length+' records on file, placed in their cells</div>');
+    el('<div style="height: 8px;"></div>');
+
+    const rows=['era-threatened','era-orthogonal','era-amplified'];
+    const cols=['high','low'];
+    const buckets={};
+    for(const p of rows) for(const m of cols) buckets[p+'/'+m]=[];
+    INDEX.forEach(r=>{
+      if(r.mediation==='mixed'){ buckets[r.pool+'/high'].push(r); buckets[r.pool+'/low'].push(r); return; }
+      const k=r.pool+'/'+r.mediation;
+      if(buckets[k]) buckets[k].push(r);
+    });
+
+    let html='';
+    const colW=30;
+    html+='<span style="color: var(--mid);">'+pad('',16)+pad('HIGH MEDIATION',colW)+'LOW MEDIATION</span>\n';
+    html+='<span style="color: var(--dim);">'+pad('',16)+'─'.repeat(colW+16)+'</span>\n';
+    for(const p of rows){
+      const poolLabel=p.toUpperCase().replace('ERA-','');
+      html+='<span style="color: var(--red);">'+pad(poolLabel,16)+'</span>';
+      for(const m of cols){
+        const recs=buckets[p+'/'+m];
+        const cell=recs.length?
+          recs.map(r=>'<span class="link" onclick="window.__hwRun(\''+r.ticker+'\')">'+r.ticker+'</span> <span style="color: '+gradeColor(r.grade)+';">'+r.grade+'</span>').join('  '):
+          '<span style="color: var(--dim);">— —</span>';
+        const cellPlain=recs.length?recs.map(r=>r.ticker+' '+r.grade).join('  '):'— —';
+        html+=pad(cell,colW+(cell.length-cellPlain.length));
+      }
+      html+='\n';
+      html+='<span style="color: var(--dim);">'+pad('',16)+'─'.repeat(colW+16)+'</span>\n';
+    }
+    el(pre(html));
+    rule();
+    el('<div style="color: var(--mid); font-size: 14px;">  era-orthogonal × low = <span style="color: var(--fg);">structurally insulated</span> · the durable cell</div>');
+    el('<div style="color: var(--mid); font-size: 14px;">  era-threatened × high = <span style="color: var(--red);">compound risk</span> · fastest decay</div>');
+    el('<div style="color: var(--mid); font-size: 14px;">  era-amplified × low = <span style="color: var(--fg);">strongest offensive position</span></div>');
+    outWrap.scrollTop=0;
+  }
+
+  function cmdHelp(){
+    clearOut(); setPageId('HELP');
+    el('<div style="color: var(--dim);">▌ COMMANDS · '+(META?.methodology||'v3.0')+' TERMINAL</div>');
+    el('<div style="height: 6px;"></div>');
+    const items=[
+      ['list','all records on file'],
+      ['<TICKER>','load a specific record'],
+      ['filter pool=<v>','era-orthogonal · era-amplified · era-threatened'],
+      ['filter mediation=<v>','low · high · mixed'],
+      ['filter grade=<v>','A · B · B- · C+ · F (etc)'],
+      ['filter durability=<v>','inherited · reformulated · leader-built · founder-active'],
+      ['filter cell=<v>','structurally-insulated · compound-risk · etc'],
+      ['compare <A> <B>','side-by-side two records'],
+      ['grid','pool × mediation map'],
+      ['home','return to home'],
+      ['help','this list'],
+      ['clear','clear screen']
+    ];
+    let html='';
+    for(const [c,d] of items){
+      html+='<span style="color: var(--red);">'+pad(c,24)+'</span><span style="color: var(--mid);">'+d+'</span>\n';
+    }
+    el(pre(html));
+    rule();
+    el('<div style="color: var(--dim);">▌ EXAMPLES</div>');
+    el('<div style="color: var(--mid);"> &nbsp; <span class="link" onclick="window.__hwRun(\'SBUX\')">[SBUX]</span> &nbsp; <span class="link" onclick="window.__hwRun(\'compare SBUX BMW\')">[compare SBUX BMW]</span> &nbsp; <span class="link" onclick="window.__hwRun(\'filter pool=era-orthogonal\')">[filter pool=era-orthogonal]</span></div>');
+    el('<div style="color: var(--mid);"> &nbsp; <span class="link" onclick="window.__hwRun(\'grid\')">[grid]</span> &nbsp; <span class="link" onclick="window.__hwRun(\'compare AAPL CHGG\')">[compare AAPL CHGG]</span></div>');
+    outWrap.scrollTop=0;
+  }
+
+  function cmdClear(){
+    clearOut(); setPageId('— —'); setContext('main'); page='home';
+    el('<div style="color: var(--mid);">cleared.</div>');
+    el('<div style="color: var(--dim);">type <span class="link" onclick="window.__hwRun(\'list\')">[list]</span> or <span class="link" onclick="window.__hwRun(\'help\')">[help]</span>.</div>');
+  }
+
+  function renderChips(){
+    chipsEl.innerHTML='';
+    let chips=[];
+    if(page==='home'){
+      chips=[{label:'list',cmd:'list',primary:true},{label:'grid',cmd:'grid'},{label:'help',cmd:'help'}];
+      setHint('try [list] for all records, or type a ticker');
+    } else if(page==='list'){
+      chips=[
+        {label:'home',cmd:'home'},
+        {label:'grid',cmd:'grid'},
+        {label:'pool=era-orthogonal',cmd:'filter pool=era-orthogonal'},
+        {label:'cell=compound-risk',cmd:'filter cell=compound-risk'},
+        {label:'grade=A',cmd:'filter grade=A'}
+      ];
+      setHint('click any ticker, or filter by [pool] / [mediation] / [grade]');
+    } else if(page==='grid'){
+      chips=[{label:'home',cmd:'home'},{label:'list',cmd:'list'}];
+      setHint('open any ticker to see the full record');
+    } else if(page==='record' && currentTicker){
+      const tickers=INDEX.map(r=>r.ticker);
+      const idx=tickers.indexOf(currentTicker);
+      const prev=idx>0?tickers[idx-1]:null;
+      const next=idx<tickers.length-1?tickers[idx+1]:null;
+      chips=[];
+      if(prev) chips.push({label:'< '+prev,cmd:prev});
+      if(next) chips.push({label:next+' >',cmd:next,primary:true});
+      chips.push({label:'list',cmd:'list'});
+      chips.push({label:'home',cmd:'home'});
+      setHint('use [< >] to step through, or [list] for all records');
+    } else {
+      chips=[{label:'home',cmd:'home',primary:true},{label:'list',cmd:'list'},{label:'grid',cmd:'grid'}];
+      setHint('explore further or [home] to return');
+    }
+    for(const c of chips){
+      const b=document.createElement('span');
+      b.className='btn'+(c.primary?' primary':'');
+      b.textContent='['+c.label+']';
+      b.onclick=()=>{ run(c.cmd); inp.focus(); };
+      chipsEl.appendChild(b);
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  //  PARSER
+  // ──────────────────────────────────────────────────────────────
+  function parseFilter(cmd){
+    const m=cmd.match(/^filter\s+(\w+)=(.+)$/i);
+    if(!m) return null;
+    return [m[1].toLowerCase(),m[2].trim()];
+  }
+  function parseCompare(cmd){
+    const m=cmd.match(/^compare\s+(\S+)\s+(\S+)$/i);
+    if(!m) return null;
+    return [m[1].toUpperCase(),m[2].toUpperCase()];
+  }
+
+  function suggest(input){
+    const pool=['help','list','home','clear','grid','filter','compare',...(INDEX?INDEX.map(r=>r.ticker):[])];
+    function lev(a,b){
+      const m=a.length,n=b.length; if(!m)return n; if(!n)return m;
+      const dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+      for(let i=0;i<=m;i++)dp[i][0]=i; for(let j=0;j<=n;j++)dp[0][j]=j;
+      for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){
+        dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+      }
+      return dp[m][n];
+    }
+    let best=null,bestD=99;
+    for(const c of pool){
+      const d=lev(input.toUpperCase(),c.toUpperCase());
+      if(d<bestD){bestD=d;best=c;}
+    }
+    return bestD<=2?best:null;
+  }
+
+  function unknown(raw){
+    const guess=suggest(raw);
+    el('<div style="color: var(--red);">unknown :: '+escapeHtml(raw)+'</div>');
+    if(guess){
+      el('<div style="color: var(--dim);">did you mean <span class="link" onclick="window.__hwRun(\''+guess+'\')">['+guess+']</span> ?</div>');
+    } else {
+      el('<div style="color: var(--dim);">type <span class="link" onclick="window.__hwRun(\'help\')">[help]</span> for commands.</div>');
+    }
+  }
+
+  async function run(raw){
+    if(busy) return;
+    if(!DATA){ el('<div style="color: var(--red);">database not loaded yet</div>'); return; }
+    const cmd=String(raw||'').trim();
+    if(!cmd) return;
+    echo(raw);
+    history.unshift(raw); histIdx=-1;
+
+    const lower=cmd.toLowerCase();
+    if(lower.startsWith('filter')){
+      const f=parseFilter(cmd);
+      if(!f){ el('<div style="color: var(--red);">filter syntax :: filter &lt;field&gt;=&lt;value&gt;</div>'); return; }
+      return pageFilter(f[0],f[1]);
+    }
+    if(lower.startsWith('compare')){
+      const c=parseCompare(cmd);
+      if(!c){ el('<div style="color: var(--red);">compare syntax :: compare &lt;TICKER&gt; &lt;TICKER&gt;</div>'); return; }
+      return pageCompare(c[0],c[1]);
+    }
+
+    switch(lower){
+      case 'help': case '?': return cmdHelp();
+      case 'list': case 'ls': return pageList();
+      case 'home': return pageHome();
+      case 'grid': case 'map': return pageGrid();
+      case 'clear': case 'cls': return cmdClear();
+    }
+
+    if(RECS[cmd.toUpperCase()]) return pageRecord(cmd.toUpperCase());
+    return unknown(raw);
+  }
+  window.__hwRun=run;
+
+  // ──────────────────────────────────────────────────────────────
+  //  INPUT
+  // ──────────────────────────────────────────────────────────────
+  inp.addEventListener('keydown',async(e)=>{
+    if(busy && e.key==='Enter'){ e.preventDefault(); return; }
+    if(e.key==='Enter'){
+      const v=inp.value; inp.value=''; await run(v); inp.focus();
+    } else if(e.key==='ArrowUp'){
+      e.preventDefault(); if(history.length===0) return;
+      histIdx=Math.min(histIdx+1,history.length-1); inp.value=history[histIdx];
+    } else if(e.key==='ArrowDown'){
+      e.preventDefault();
+      histIdx=Math.max(histIdx-1,-1); inp.value=histIdx===-1?'':history[histIdx];
+    }
+  });
+
+  helpBtn.onclick=()=>{ run('help'); inp.focus(); };
+  document.getElementById('hw').addEventListener('click',(e)=>{
+    if(e.target.tagName==='SPAN' && (e.target.classList.contains('btn')||e.target.classList.contains('link'))) return;
+    inp.focus();
+  });
+
+  // ──────────────────────────────────────────────────────────────
+  //  BOOT — fetch data.json, then render
+  // ──────────────────────────────────────────────────────────────
+  async function boot(){
+    await typeLine('<span style="color: var(--dim);">init :: hardwired terminal</span>',5);
+    await typeLine('<span style="color: var(--dim);">fetching database ........................ </span>',4);
+
+    try {
+      const res = await fetch('data.json', { cache: 'no-cache' });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      DATA = await res.json();
+      META = DATA._meta || {};
+      INDEX = DATA._index || [];
+      RECS = DATA.records || {};
+      metaVer.textContent = META.methodology || 'v—';
+      await typeLine('<span style="color: var(--dim);">database loaded ......................... </span><span style="color: var(--fg);">'+INDEX.length+' records · methodology '+(META.methodology||'—')+'</span>',4);
+      rule();
+      pageHome();
+    } catch (err) {
+      rule();
+      el('<div style="color: var(--red);">database load failed :: '+escapeHtml(err.message)+'</div>');
+      el('<div style="color: var(--dim);">expected file :: data.json (sibling of index.html)</div>');
+      el('<div style="color: var(--mid); padding-top: 8px;">if you are running this from a file:// URL the browser may block fetch.</div>');
+      el('<div style="color: var(--mid);">serve the folder over http (e.g. <span style="color: var(--fg);">python3 -m http.server</span>) and reload.</div>');
+    }
+  }
+  boot();
+
+})();
+</script>
+
+</body>
+</html>

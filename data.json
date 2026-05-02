@@ -1,0 +1,833 @@
+{
+  "_meta": {
+    "methodology": "v3.0",
+    "lastPublished": "2026-05-02",
+    "publisher": "Inverness Consulting",
+    "publication": "Hardwired",
+    "schemaVersion": "1"
+  },
+  "_index": [
+    {
+      "ticker": "AAPL",
+      "name": "Apple",
+      "grade": "A",
+      "pool": "era-amplified",
+      "mediation": "low",
+      "durability": "reformulated",
+      "cell": "strongest-offensive-position",
+      "scoredOn": "2026-04-15",
+      "methodology": "v3.0"
+    },
+    {
+      "ticker": "COST",
+      "name": "Costco",
+      "grade": "A",
+      "pool": "era-orthogonal",
+      "mediation": "low",
+      "durability": "inherited",
+      "cell": "structurally-insulated",
+      "scoredOn": "2026-04-15",
+      "methodology": "v3.0"
+    },
+    {
+      "ticker": "RMS",
+      "name": "Hermès",
+      "grade": "A",
+      "pool": "era-orthogonal",
+      "mediation": "low",
+      "durability": "inherited",
+      "cell": "structurally-insulated",
+      "scoredOn": "2026-04-15",
+      "methodology": "v3.0"
+    },
+    {
+      "ticker": "SBUX",
+      "name": "Starbucks",
+      "grade": "B-",
+      "pool": "era-orthogonal",
+      "mediation": "low",
+      "durability": "leader-built",
+      "cell": "structurally-insulated",
+      "scoredOn": "2026-04-30",
+      "methodology": "v3.0"
+    },
+    {
+      "ticker": "BMW",
+      "name": "BMW",
+      "grade": "C+",
+      "pool": "era-threatened",
+      "mediation": "mixed",
+      "durability": "reformulated",
+      "cell": "compound-risk-adjacent",
+      "scoredOn": "2026-04-22",
+      "methodology": "v3.0"
+    },
+    {
+      "ticker": "CHGG",
+      "name": "Chegg",
+      "grade": "F",
+      "pool": "era-threatened",
+      "mediation": "high",
+      "durability": "leader-built",
+      "cell": "compound-risk",
+      "scoredOn": "2026-03-20",
+      "methodology": "v3.0"
+    }
+  ],
+  "records": {
+    "SBUX": {
+      "ticker": "SBUX",
+      "name": "Starbucks",
+      "fullName": "Starbucks Corporation",
+      "exchange": "NASDAQ",
+      "founded": 1971,
+      "ceo": "Brian Niccol",
+      "grade": "B-",
+      "pool": "era-orthogonal",
+      "mediation": "low",
+      "durability": "leader-built",
+      "cell": "structurally-insulated",
+      "scoredOn": "2026-04-30",
+      "methodology": "v3.0",
+      "rescoreTriggers": [
+        "CEO transition within 12 months",
+        "comp growth divergence > 200bps"
+      ],
+      "differences": [
+        "third-place ritual at scale",
+        "global premium-coffee category identity",
+        "barista-mediated experience as product"
+      ],
+      "verdict": "Leader-rebuild inside an institution that lacked prior coherence. Structurally insulated by category and mediation, not by ownership form.",
+      "dimensions": {
+        "d1": {
+          "score": 3,
+          "label": "Philosophy",
+          "note": "Articulate (Back to Starbucks). Internally contradictory. Not yet operationally enforced."
+        },
+        "d2": {
+          "score": 4,
+          "label": "Era-relevance",
+          "note": "Third place is era-orthogonal; LLMs do not substitute physical ritual."
+        },
+        "d3": {
+          "score": 4,
+          "label": "Decisions",
+          "note": "$1B restructure, 627 closures, $500M partner hours."
+        },
+        "d4": {
+          "score": 3,
+          "label": "Active response",
+          "note": "Apr 15 ChatGPT integration in protocol layer. Hardwiring not yet matched."
+        },
+        "d5": {
+          "score": 1,
+          "label": "Constitutional",
+          "note": "No founder, no charter, no foundation, no constraint."
+        },
+        "d6": {
+          "score": 3,
+          "label": "Institutional",
+          "note": "Operating ritual exists; under reconstruction."
+        },
+        "d7": {
+          "score": 4,
+          "label": "Leadership",
+          "note": "Niccol reformulated philosophy credibly. Has not survived a transition."
+        },
+        "d8": {
+          "score": 4,
+          "label": "Revenue protect.",
+          "note": "Pool insulates. Q2 transactions +4.3%."
+        },
+        "d9": {
+          "score": 2,
+          "label": "Revenue create",
+          "note": "Principled-passivity adjacent."
+        }
+      },
+      "gates": {
+        "selfKnowledge": "pass",
+        "eraRelevance": "pass",
+        "structuralProtection": "fail",
+        "activeResponse": "partial",
+        "internalCoherence": "partial"
+      },
+      "miniTest": {
+        "figure": "no operational figure with stop authority",
+        "moment": null,
+        "result": "fail"
+      },
+      "adversarialFlags": [
+        "philosophy articulated but no operational check exists — Dim 1 capped at 3",
+        "no constraint a successor must dismantle in public — infrastructure 1/5",
+        "ChatGPT integration is protocol-layer, not hardwiring — active response capped at 3"
+      ],
+      "financialCheck": {
+        "trajectory": "growing, 3 quarters of comp growth",
+        "marginTrend": "+117bps to 9.4%",
+        "valid": true,
+        "note": "B− does not require A-grade financial confirmation"
+      },
+      "fix": {
+        "programs": [
+          "300 stores remodelled",
+          "mobile-order-only phased out",
+          "in-store service restored",
+          "labor reinvestment"
+        ],
+        "constraints": [
+          "barista certification standard",
+          "published staffing floor",
+          "roastery membership tier",
+          "cap on store density"
+        ]
+      },
+      "era": {
+        "synthesisLayer": {
+          "status": "awaiting",
+          "text": null,
+          "verifiedOn": null,
+          "verifiedAgainst": [],
+          "query": "what is distinctive about Starbucks?",
+          "note": "Pending: query frontier models and record what surfaces."
+        },
+        "transactionLayer": {
+          "status": "verified",
+          "text": "Starbucks added ChatGPT-based ordering on April 15, 2026, alongside Etsy and Walmart on OpenAI's confirmed merchant list.",
+          "verifiedOn": "2026-04-30"
+        },
+        "agentReadability": {
+          "status": "verified",
+          "text": "No published certification standard, staffing floor, density cap, or other structural commitment a model could cite as Starbucks's actual difference.",
+          "verifiedOn": "2026-04-30"
+        },
+        "verdict": "Live at the agent-transaction layer. No structural commitments exist for an agent to surface as the brand's difference."
+      },
+      "flags": []
+    },
+    "COST": {
+      "ticker": "COST",
+      "name": "Costco",
+      "fullName": "Costco Wholesale Corporation",
+      "exchange": "NASDAQ",
+      "founded": 1976,
+      "ceo": "Ron Vachris",
+      "grade": "A",
+      "pool": "era-orthogonal",
+      "mediation": "low",
+      "durability": "inherited",
+      "cell": "structurally-insulated",
+      "scoredOn": "2026-04-15",
+      "methodology": "v3.0",
+      "rescoreTriggers": [
+        "CEO transition",
+        "markup-cap modification"
+      ],
+      "differences": [
+        "published markup cap (14% / 15% Kirkland)",
+        "membership economics over per-item margin",
+        "operational discipline as cultural identity"
+      ],
+      "verdict": "The published constraint is the philosophy made operational. Forty years of public defence makes drift visible before it can occur.",
+      "dimensions": {
+        "d1": {
+          "score": 5,
+          "label": "Philosophy",
+          "note": "Markup cap is philosophy, operational rule, and external signal in one."
+        },
+        "d2": {
+          "score": 4,
+          "label": "Era-relevance",
+          "note": "Physical category, membership category. LLMs do not route through it."
+        },
+        "d3": {
+          "score": 5,
+          "label": "Decisions",
+          "note": "Forty years of decisions defending the cap."
+        },
+        "d4": {
+          "score": 4,
+          "label": "Active response",
+          "note": "Principled-passivity adjacent. AI posture deliberately quiet."
+        },
+        "d5": {
+          "score": 3,
+          "label": "Constitutional",
+          "note": "No special ownership; institutional discipline substitutes."
+        },
+        "d6": {
+          "score": 5,
+          "label": "Institutional",
+          "note": "Buyer authority, supply-chain rituals, member-first capital allocation."
+        },
+        "d7": {
+          "score": 4,
+          "label": "Leadership",
+          "note": "Vachris transition handled cleanly. Founder discipline survived."
+        },
+        "d8": {
+          "score": 5,
+          "label": "Revenue protect.",
+          "note": "Membership renewal rates >90%. Pool and mediation both insulate."
+        },
+        "d9": {
+          "score": 3,
+          "label": "Revenue create",
+          "note": "Modest era-capture; philosophy does not authorise expansion."
+        }
+      },
+      "gates": {
+        "selfKnowledge": "pass",
+        "eraRelevance": "pass",
+        "structuralProtection": "pass",
+        "activeResponse": "pass",
+        "internalCoherence": "pass"
+      },
+      "miniTest": {
+        "figure": "buyer with kill authority on any product violating cap or quality standard",
+        "moment": "2024 SKU rationalisations on private-label items that drifted upmarket",
+        "result": "pass"
+      },
+      "adversarialFlags": [],
+      "financialCheck": {
+        "trajectory": "compounding — 8% comp growth, membership growing",
+        "marginTrend": "stable; deliberately not expanded",
+        "valid": true,
+        "note": "A grade confirmed by financials"
+      },
+      "fix": {
+        "programs": [],
+        "constraints": []
+      },
+      "era": {
+        "synthesisLayer": {
+          "status": "awaiting",
+          "text": null,
+          "verifiedOn": null,
+          "verifiedAgainst": [],
+          "query": "what is distinctive about Costco?",
+          "note": "Pending: query frontier models and record what surfaces."
+        },
+        "transactionLayer": {
+          "status": "verified",
+          "text": "No agent-channel integration as of April 2026.",
+          "verifiedOn": "2026-04-15"
+        },
+        "agentReadability": {
+          "status": "verified",
+          "text": "The 14% markup cap (15% on Kirkland) is documented in earnings calls going back four decades and would be cited by any model asked about Costco's pricing discipline.",
+          "verifiedOn": "2026-04-15"
+        },
+        "verdict": "The published cap is the structural commitment models can cite. No agent integration; the philosophy does not authorise one."
+      },
+      "flags": []
+    },
+    "RMS": {
+      "ticker": "RMS",
+      "name": "Hermès",
+      "fullName": "Hermès International",
+      "exchange": "EPA",
+      "founded": 1837,
+      "ceo": "Axel Dumas",
+      "grade": "A",
+      "pool": "era-orthogonal",
+      "mediation": "low",
+      "durability": "inherited",
+      "cell": "structurally-insulated",
+      "scoredOn": "2026-04-15",
+      "methodology": "v3.0",
+      "rescoreTriggers": [
+        "family-control change",
+        "apprenticeship-program modification"
+      ],
+      "differences": [
+        "two-year artisan apprenticeship before Birkin authorisation",
+        "production growth capped at 6-7% annually",
+        "vertical control of leather goods supply"
+      ],
+      "verdict": "Scarcity is structural, not marketing. The apprenticeship is what the brand is — scaling faster requires dismantling it.",
+      "dimensions": {
+        "d1": {
+          "score": 5,
+          "label": "Philosophy",
+          "note": "Apprenticeship + production cap + family control are one operational system."
+        },
+        "d2": {
+          "score": 4,
+          "label": "Era-relevance",
+          "note": "Physical craft category. AI substitution does not apply."
+        },
+        "d3": {
+          "score": 5,
+          "label": "Decisions",
+          "note": "Repeated refusals to scale leather goods despite demand."
+        },
+        "d4": {
+          "score": 4,
+          "label": "Active response",
+          "note": "Principled-passivity. Philosophy explicitly does not authorise era-expansion."
+        },
+        "d5": {
+          "score": 5,
+          "label": "Constitutional",
+          "note": "Family-controlled holding company structure designed to defeat takeover."
+        },
+        "d6": {
+          "score": 5,
+          "label": "Institutional",
+          "note": "Apprenticeship, atelier system, leather supply-chain control all load-bearing."
+        },
+        "d7": {
+          "score": 4,
+          "label": "Leadership",
+          "note": "Dumas continues philosophy; family transitions stress-tested."
+        },
+        "d8": {
+          "score": 5,
+          "label": "Revenue protect.",
+          "note": "Demand structurally exceeds supply by design."
+        },
+        "d9": {
+          "score": 2,
+          "label": "Revenue create",
+          "note": "Principled-passivity correctly applied. Absence is not failure."
+        }
+      },
+      "gates": {
+        "selfKnowledge": "pass",
+        "eraRelevance": "pass",
+        "structuralProtection": "pass",
+        "activeResponse": "pass",
+        "internalCoherence": "pass"
+      },
+      "miniTest": {
+        "figure": "atelier-level artisan with delay authority on any Birkin",
+        "moment": "ongoing; Birkin waitlists are the visible artifact",
+        "result": "pass"
+      },
+      "adversarialFlags": [],
+      "financialCheck": {
+        "trajectory": "compounding within philosophy-bounded growth limits",
+        "marginTrend": "expanding — luxury-segment leadership",
+        "valid": true,
+        "note": "A grade confirmed by financials"
+      },
+      "fix": {
+        "programs": [],
+        "constraints": []
+      },
+      "era": {
+        "synthesisLayer": {
+          "status": "awaiting",
+          "text": null,
+          "verifiedOn": null,
+          "verifiedAgainst": [],
+          "query": "what is distinctive about Hermès?",
+          "note": "Pending: query frontier models and record what surfaces."
+        },
+        "transactionLayer": {
+          "status": "verified",
+          "text": "No agent-channel integration. Allocation is by boutique-director discretion; the transaction model is not designed to be agent-routable.",
+          "verifiedOn": "2026-04-15"
+        },
+        "agentReadability": {
+          "status": "verified",
+          "text": "The two-year apprenticeship requirement and the family-controlled holding structure are documented and would be cited by any model asked about Hermès's scarcity.",
+          "verifiedOn": "2026-04-15"
+        },
+        "verdict": "Structural commitments are cite-able. Agent integration is absent by design — the philosophy does not permit it."
+      },
+      "flags": []
+    },
+    "BMW": {
+      "ticker": "BMW",
+      "name": "BMW",
+      "fullName": "Bayerische Motoren Werke AG",
+      "exchange": "ETR",
+      "founded": 1916,
+      "ceo": "Oliver Zipse",
+      "grade": "C+",
+      "pool": "era-threatened",
+      "mediation": "mixed",
+      "durability": "reformulated",
+      "cell": "compound-risk-adjacent",
+      "scoredOn": "2026-04-22",
+      "methodology": "v3.0",
+      "rescoreTriggers": [
+        "China market position change",
+        "CEO transition",
+        "EV-strategy reformulation"
+      ],
+      "differences": [
+        "Sheer Driving Pleasure as articulated product philosophy",
+        "premium German engineering category identity",
+        "vertically-integrated ICE manufacturing"
+      ],
+      "verdict": "Articulated philosophy hollowed by China collapse and product-level drift. The canonical drift-toward-charity case in v3 methodology lessons.",
+      "dimensions": {
+        "d1": {
+          "score": 2,
+          "label": "Philosophy",
+          "note": "Sheer Driving Pleasure articulated; product range does not embody it. MINI test fails."
+        },
+        "d2": {
+          "score": 2,
+          "label": "Era-relevance",
+          "note": "Chinese NEVs substituting category at premium-price tier."
+        },
+        "d3": {
+          "score": 3,
+          "label": "Decisions",
+          "note": "Recent EV pivots are reactive, not protective."
+        },
+        "d4": {
+          "score": 2,
+          "label": "Active response",
+          "note": "AI-as-features posture; not philosophy-matched."
+        },
+        "d5": {
+          "score": 3,
+          "label": "Constitutional",
+          "note": "Quandt family stake provides some structural ballast."
+        },
+        "d6": {
+          "score": 3,
+          "label": "Institutional",
+          "note": "Engineering culture intact but compromised on product-by-product basis."
+        },
+        "d7": {
+          "score": 3,
+          "label": "Leadership",
+          "note": "Zipse has not survived the kind of crisis that proves out adaptability."
+        },
+        "d8": {
+          "score": 2,
+          "label": "Revenue protect.",
+          "note": "China revenue down materially. Premium-tier compression visible."
+        },
+        "d9": {
+          "score": 1,
+          "label": "Revenue create",
+          "note": "Era-expansion absent; not principled-passivity, structural failure."
+        }
+      },
+      "gates": {
+        "selfKnowledge": "fail",
+        "eraRelevance": "fail",
+        "structuralProtection": "partial",
+        "activeResponse": "fail",
+        "internalCoherence": "partial"
+      },
+      "miniTest": {
+        "figure": "no current figure with cross-product authority to reject vehicles failing the philosophy",
+        "moment": "iX rollout, early electric-MINI execution — neither blocked despite philosophy mismatch",
+        "result": "fail"
+      },
+      "adversarialFlags": [
+        "drift-toward-charity: scored A− → A → A− → B− → C+ across five rounds; C+ is honest grade",
+        "philosophy is communications, not enforcement — Dim 1 capped at 2",
+        "Chinese NEV pressure is era-structural, not competitive variance",
+        "no decision in last 24 months that the philosophy ruled out"
+      ],
+      "financialCheck": {
+        "trajectory": "China revenue declining materially; group revenue under pressure",
+        "marginTrend": "compressing — premium pricing power eroding",
+        "valid": true,
+        "note": "C+ confirmed by financials"
+      },
+      "fix": {
+        "programs": [
+          "EV platform investments",
+          "MINI brand reformulation",
+          "China local-production expansion"
+        ],
+        "constraints": [
+          "product-philosophy stop authority",
+          "premium-floor pricing discipline",
+          "platform refusal to dilute driving character"
+        ]
+      },
+      "era": {
+        "synthesisLayer": {
+          "status": "awaiting",
+          "text": null,
+          "verifiedOn": null,
+          "verifiedAgainst": [],
+          "query": "what is distinctive about BMW?",
+          "note": "Pending: query frontier models and record what surfaces."
+        },
+        "transactionLayer": {
+          "status": "verified",
+          "text": "No coherent agent-channel posture. ConnectedDrive and iDrive are in-vehicle features, not external agent integrations. Car-shopping disintermediation is happening at the buyer side via third-party agents BMW does not control.",
+          "verifiedOn": "2026-04-22"
+        },
+        "agentReadability": {
+          "status": "verified",
+          "text": "'Sheer Driving Pleasure' is a marketing line. No published constraint, certification, or structural rule a model could cite as the brand's actual difference.",
+          "verifiedOn": "2026-04-22"
+        },
+        "verdict": "Marketing language without structural backing. Agent layer is acting on BMW; BMW is not acting at the agent layer."
+      },
+      "flags": []
+    },
+    "AAPL": {
+      "ticker": "AAPL",
+      "name": "Apple",
+      "fullName": "Apple Inc.",
+      "exchange": "NASDAQ",
+      "founded": 1976,
+      "ceo": "Tim Cook",
+      "grade": "A",
+      "pool": "era-amplified",
+      "mediation": "low",
+      "durability": "reformulated",
+      "cell": "strongest-offensive-position",
+      "scoredOn": "2026-04-15",
+      "methodology": "v3.0",
+      "rescoreTriggers": [
+        "Cook transition (12-month window)",
+        "agent-layer disintermediation evidence",
+        "Services growth divergence"
+      ],
+      "differences": [
+        "vertical hardware-software-services integration",
+        "direct customer relationship at billion-device scale",
+        "premium-pricing discipline maintained across cycles"
+      ],
+      "verdict": "Integrated system real and producing. But era is amplifying and Apple is not capturing it — disconnected on Dim 4 even at A grade overall.",
+      "dimensions": {
+        "d1": {
+          "score": 4,
+          "label": "Philosophy",
+          "note": "Integration philosophy clear and lived; product-level differentiation operational."
+        },
+        "d2": {
+          "score": 4,
+          "label": "Era-relevance",
+          "note": "Devices remain primary AI surface for consumers; pool amplified."
+        },
+        "d3": {
+          "score": 4,
+          "label": "Decisions",
+          "note": "Vision Pro, M-series silicon, on-device AI — calibrated to philosophy."
+        },
+        "d4": {
+          "score": 2,
+          "label": "Active response",
+          "note": "Visibly behind on frontier AI; partnerships reactive. The Disconnected pattern."
+        },
+        "d5": {
+          "score": 3,
+          "label": "Constitutional",
+          "note": "Standard structure; founder long gone; infrastructure substitutes."
+        },
+        "d6": {
+          "score": 5,
+          "label": "Institutional",
+          "note": "Operating discipline, capital returns, supply-chain authority all load-bearing."
+        },
+        "d7": {
+          "score": 4,
+          "label": "Leadership",
+          "note": "Cook reformulated post-Jobs successfully; transition timing now itself a risk."
+        },
+        "d8": {
+          "score": 5,
+          "label": "Revenue protect.",
+          "note": "Services growth, installed base, ecosystem lock-in. Pool amplifies."
+        },
+        "d9": {
+          "score": 2,
+          "label": "Revenue create",
+          "note": "Era-amplified pool; Apple is not capturing the era. The disconnection."
+        }
+      },
+      "gates": {
+        "selfKnowledge": "pass",
+        "eraRelevance": "pass",
+        "structuralProtection": "pass",
+        "activeResponse": "fail",
+        "internalCoherence": "partial"
+      },
+      "miniTest": {
+        "figure": "human interface team and Federighi-level engineering authority",
+        "moment": "Vision Pro feature gating; on-device AI restraint",
+        "result": "pass"
+      },
+      "adversarialFlags": [
+        "the Disconnected pattern: era is working for Apple; Apple is not capturing it",
+        "more AI features will not close the gap — depth will",
+        "transition risk increases the longer Cook stays without succession clarity"
+      ],
+      "financialCheck": {
+        "trajectory": "stable revenue, Services compounding",
+        "marginTrend": "stable at high level",
+        "valid": true,
+        "note": "A holds; gap is structural-strategic, not financial"
+      },
+      "fix": {
+        "programs": [
+          "Apple Intelligence rollout",
+          "Vision Pro generation 2",
+          "on-device foundation models"
+        ],
+        "constraints": [
+          "named depth-investment matched to era",
+          "succession clarity",
+          "philosophy-to-action authority on AI"
+        ]
+      },
+      "era": {
+        "synthesisLayer": {
+          "status": "awaiting",
+          "text": null,
+          "verifiedOn": null,
+          "verifiedAgainst": [],
+          "query": "what is distinctive about Apple?",
+          "note": "Pending: query frontier models and record what surfaces."
+        },
+        "transactionLayer": {
+          "status": "verified",
+          "text": "Apple Intelligence rolled out across iOS 18; OpenAI integration shipped in 2024 and Anthropic partnership announced in 2025. No first-party frontier model.",
+          "verifiedOn": "2026-04-15"
+        },
+        "agentReadability": {
+          "status": "verified",
+          "text": "Privacy commitments and on-device processing are documented and would be cited. Frontier-AI capability is delegated to partners and would also be surfaced as a partial reading.",
+          "verifiedOn": "2026-04-15"
+        },
+        "verdict": "Structural commitments on privacy and integration are cite-able. Frontier-AI capability is reactive and visible as such."
+      },
+      "flags": []
+    },
+    "CHGG": {
+      "ticker": "CHGG",
+      "name": "Chegg",
+      "fullName": "Chegg, Inc.",
+      "exchange": "NYSE",
+      "founded": 2005,
+      "ceo": "Nathan Schultz",
+      "grade": "F",
+      "pool": "era-threatened",
+      "mediation": "high",
+      "durability": "leader-built",
+      "cell": "compound-risk",
+      "scoredOn": "2026-03-20",
+      "methodology": "v3.0",
+      "rescoreTriggers": [
+        "going-concern event",
+        "structural reorganisation"
+      ],
+      "differences": [
+        "subject-matter expert answer database",
+        "subscription homework-help service",
+        "student-acquisition funnel via SEO"
+      ],
+      "verdict": "AI replaces the value proposition itself, not a feature within it. Hardwiring cannot defend what hardwiring cannot touch.",
+      "dimensions": {
+        "d1": {
+          "score": 1,
+          "label": "Philosophy",
+          "note": "Stated mission; no operational enforcement of differentiation versus ChatGPT."
+        },
+        "d2": {
+          "score": 0,
+          "label": "Era-relevance",
+          "note": "Direct substitution by frontier LLMs."
+        },
+        "d3": {
+          "score": 1,
+          "label": "Decisions",
+          "note": "AI partnerships and pivots are defensive features, not protective architecture."
+        },
+        "d4": {
+          "score": 1,
+          "label": "Active response",
+          "note": "Reactive AI integration; cannot reposition out of substitution."
+        },
+        "d5": {
+          "score": 1,
+          "label": "Constitutional",
+          "note": "Standard public-company structure; nothing protects the philosophy."
+        },
+        "d6": {
+          "score": 2,
+          "label": "Institutional",
+          "note": "Operations exist; cannot offset category collapse."
+        },
+        "d7": {
+          "score": 2,
+          "label": "Leadership",
+          "note": "Schultz inherited the substitution event; not a survival case yet."
+        },
+        "d8": {
+          "score": 0,
+          "label": "Revenue protect.",
+          "note": "Subscribers down >50% from peak."
+        },
+        "d9": {
+          "score": 0,
+          "label": "Revenue create",
+          "note": "No new revenue captured from era. The era is the threat."
+        }
+      },
+      "gates": {
+        "selfKnowledge": "fail",
+        "eraRelevance": "fail",
+        "structuralProtection": "fail",
+        "activeResponse": "fail",
+        "internalCoherence": "fail"
+      },
+      "miniTest": {
+        "figure": "no operational figure with authority over category-level repositioning",
+        "moment": null,
+        "result": "fail"
+      },
+      "adversarialFlags": [
+        "category-substitution case — hardwiring cannot defend an erasure",
+        "every AI feature added accelerates rather than slows the substitution",
+        "managed decline likely returns more than continued defence"
+      ],
+      "financialCheck": {
+        "trajectory": "structural decline — revenue, subscribers, market cap all measurably eroding",
+        "marginTrend": "collapsing",
+        "valid": true,
+        "note": "F confirmed by financials"
+      },
+      "fix": {
+        "programs": [
+          "AI tutor integrations",
+          "skill-credentialing pivots",
+          "B2B partnerships"
+        ],
+        "constraints": [
+          "honest acknowledgment of category substitution",
+          "structural reorganisation around defensible asset"
+        ]
+      },
+      "era": {
+        "synthesisLayer": {
+          "status": "awaiting",
+          "text": null,
+          "verifiedOn": null,
+          "verifiedAgainst": [],
+          "query": "what is distinctive about Chegg?",
+          "note": "Pending: query frontier models and record what surfaces."
+        },
+        "transactionLayer": {
+          "status": "verified",
+          "text": "AI tutor integrations announced 2023-2024. None reverse the underlying substitution by ChatGPT and equivalent free tools.",
+          "verifiedOn": "2026-03-20"
+        },
+        "agentReadability": {
+          "status": "verified",
+          "text": "No structural commitment exists that distinguishes Chegg from a free LLM tutor. The category itself is what's being substituted, not a feature within it.",
+          "verifiedOn": "2026-03-20"
+        },
+        "verdict": "Adding agent capability accelerates rather than slows the underlying substitution. Structural commitments would not survive the category change."
+      },
+      "flags": []
+    }
+  }
+}

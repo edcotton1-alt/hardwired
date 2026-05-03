@@ -1,60 +1,92 @@
 # Hardwired Terminal
 
-A working surface for the Hardwired framework. v3.0 methodology, database-driven.
+A working surface for the Hardwired framework. v3.1 methodology, database-driven.
 
 ## Files
 
 ```
-hardwired-terminal/
-├── index.html    public terminal — read-only, fetches data.json on load
-├── eval.html     analyst terminal — read/write (Phase 2, in progress)
-└── data.json     single source of truth — every company record lives here
+hardwired/
+├── index.html       public terminal — read-only
+├── eval.html        v3 migration terminal — Ed's working surface
+├── data.json        the published dataset
+├── methodology.md   v3.1 methodology specification
+└── README.md
 ```
+
+## Current phase: V3 migration
+
+The framework recently moved from v2 to v3 methodology, then refined to v3.1
+to operationalise the era evaluation. The eval terminal contains 64 v2
+records that need to be walked through v3.1 review one by one. As records
+are validated, they accumulate in `eval.html`'s localStorage.
+
+When all 64 records are v3.1-validated, Ed runs `publish` in `eval.html`,
+which downloads a fresh `data.json` containing the locked dataset. He drags
+that file onto github.com to replace the existing `data.json`. The public
+terminal then reads the new locked data.
+
+Until that moment, `data.json` contains only the records already validated
+under v3.1, and the public terminal shows those.
 
 ## Architecture
 
-One JSON, two surfaces.
+- **index.html** — public terminal. Reads `data.json`. Untouched during migration.
+- **eval.html** — v3 migration terminal. Self-contained: 64 v2 records baked in,
+  6 v3 records carry forward on first boot, all working state in localStorage.
+  No GitHub fetch. No second input file.
+- **data.json** — current public dataset. Will be replaced once migration completes.
+- **methodology.md** — v3.1 specification. The authoritative document.
 
-- **index.html** is what subscribers see. It fetches `data.json` and renders.
-- **eval.html** is what Ed uses to score, update, and maintain records.
-- **data.json** is the only file with content. Edit it, commit it, GitHub Pages
-  republishes within a minute.
+## V3.1 review procedure
 
-## Hosting
+`review <TICKER>` walks the v3.1 methodology procedure:
 
-GitHub Pages, free, version-controlled. Every change to `data.json` is a git
-commit, which automatically gives the publication a dated audit trail —
-satisfying the v3 discipline of *every grade is dated and methodology-stamped*
-without Ed having to remember to log anything.
+1. Show the v2 reading at each step
+2. Three named differences
+3. Verdict (the honest answer to v3's three questions)
+4. Pool, mediation, cluster, durability classification
+5. Grade decision (drift-toward-charity warning if migrating downward)
+6. MINI test (named figure, named moment, result)
+7. Financial-trajectory check (3 prompts + validity)
+8. Era evaluation (v3.1 — four-step):
+   - Agent-callability — present, absent, what philosophy authorises
+   - Agent-readability — name a structural commitment models could cite
+   - Four hedges — direct relationships, category identity,
+     capital authority, institutional trust
+   - Era verdict — one closing line
+9. Re-score triggers
+10. Research notes (optional, private)
 
-## Workflow
+The wizard preserves the v2 headline, reasoning bullets, chips, category, and
+position into the v3.1 record so the published surface keeps the strong v2
+writing alongside the v3.1 apparatus.
 
-To add or update a company:
+## What v3.1 changes from v3.0
 
-1. Open `eval.html` (Phase 2)
-2. Run `add MSFT` or `edit SBUX`
-3. Walk through the v3 procedure
-4. Run `export` — downloads a fresh `data.json`
-5. Replace `data.json` in the repo
-6. Commit and push
-7. Public terminal updates within ~1 minute
+The era evaluation, previously an implicit consequence of era-relevance and
+mediation exposure, is now named explicitly and operationalised as three tests
+plus the four-hedges check from the substrates document:
 
-## Schema
+- **Synthesis layer** — what frontier models surface about the company
+- **Agent-callability** — can an agent complete a commercial path with the
+  company under its philosophy (split into present / absent / authorised)
+- **Agent-readability** — structural commitments models could cite
 
-`data.json` has three top-level blocks:
+The four hedges (direct customer relationships, category identity LLMs
+describe as canonical, capital authority for partnerships, institutional
+trust signals) are surfaced as a check during review. A company strong on at
+least two hedges is structurally defended at the agent layer.
 
-- `_meta` — methodology version, last published date, publisher
-- `_index` — light index of every record (ticker, grade, pool, mediation,
-  durability, cell, scoredOn). Used for list, grid, and filter views.
-- `records` — full v3 record per company, keyed by ticker
+Mediation exposure is now connected to the agent-era ledger logic: low
+mediation = direct relationships = brand becomes an entry in the buyer's
+operating context. High mediation = the retailer becomes the ledger entry.
 
-Each record carries the full v3 apparatus: 9 dimensions, 5 gates, MINI test,
-adversarial flags, financial check, programs and constraints, era evaluation,
-re-score triggers, methodology stamp, scored-on date.
+No grades require revision under v3.1. The change is operational, not
+doctrinal.
 
 ## Methodology
 
-v3.0 · April 2026 · Inverness Consulting · always in beta.
+v3.1 · May 2026 · Inverness Consulting · always in beta.
 
 The framework asks three questions of every company: what are the differences,
 is the company protecting them, is the company capitalising where it can.
